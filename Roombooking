@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract RoomBooking {
+    address public owner;
+    mapping(uint256 => address) private bookedRooms;
+    uint256 public bookingLimit = 4;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
+        _;
+    }
+
+    function bookRoom(uint256 roomNumber, uint256 bookingTime) external {
+        // Check if the booking time is between 1AM to 6AM
+        assert(bookingTime >= 1 && bookingTime <= 6);
+
+        // Check if the owner is booking a room with a multiple of 3
+        require(roomNumber % 3 == 0, "This room is already booked");
+
+        // Check if the owner has not exceeded the booking limit
+       if (getBookingCount(msg.sender) == bookingLimit) {
+    revert("Your booking limit is exceeded");
+}
+
+        // Book the room
+        bookedRooms[roomNumber] = msg.sender;
+    }
+
+    function getBookingCount(address user) private view returns (uint256) {
+        uint256 count;
+        for (uint256 i = 1; i <= 100; i++) {
+            if (bookedRooms[i] == user) {
+                count++;
+            }
+        }
+        return count;
+    }
+}
